@@ -1,9 +1,9 @@
 // @desc    Auth user & get token
 // route    POST /api/users/auth
 // @access  public
-import asyncHandler from "express-async-handler";
-import User from "../models/userModel.js";
-import generateToken from "../utils/generateToken.js";
+import asyncHandler from 'express-async-handler';
+import User from '../models/userModel.js';
+import generateToken from '../utils/generateToken.js';
 
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -19,7 +19,7 @@ const authUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(401);
-    throw new Error("Invalid email or password!");
+    throw new Error('Invalid email or password!');
   }
 });
 
@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (userExists) {
     res.status(400);
-    throw new Error("User already exists!");
+    throw new Error('User already exists!');
   }
 
   const user = await User.create({ name, email, password });
@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(400);
-    throw new Error("Invalid user data!");
+    throw new Error('Invalid user data!');
   }
 });
 
@@ -55,9 +55,9 @@ const registerUser = asyncHandler(async (req, res) => {
 // route    POST /api/users/logout
 // @access  public
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie("jwt", "", { httpOnly: true, expires: new Date(0) });
+  res.cookie('jwt', '', { httpOnly: true, expires: new Date(0) });
 
-  res.status(200).json({ message: "User logged out" });
+  res.status(200).json({ message: 'User logged out' });
 });
 
 // @desc    Get user profile
@@ -87,7 +87,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     res.status(200).json({ _id: updatedUser._id, name: updatedUser.name, email: updatedUser.email });
   } else {
     res.status(404);
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
 });
 

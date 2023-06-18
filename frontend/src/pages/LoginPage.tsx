@@ -1,15 +1,41 @@
-import { FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { FormEvent, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Row, Col } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import FormContainer from '../components/FormContainer';
+import { useLoginMutation } from '../features/api/usersApiSlice';
+import { setCredentials } from '../features/auth/authSlice';
+import { toast } from 'react-toastify';
+import { RootState } from '../store/store';
+import Loader from '../components/Loader';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
+
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/');
+    }
+  }, [navigate, userInfo]);
+
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Submit');
+    try {
+      const res = await login({ email, password }).unwrap();
+
+      dispatch(setCredentials({ ...res }));
+      navigate('/');
+    } catch (err: any) {
+      toast.error(err?.data?.message || err.error);
+    }
   };
 
   return (
@@ -25,7 +51,7 @@ const LoginPage = () => {
             onChange={(e) => setEmail(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        <Form.Group className="my-2" controlId="email">
+        <Form.Group className="my-2" controlId="password">
           <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
@@ -34,6 +60,8 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           ></Form.Control>
         </Form.Group>
+
+        {isLoading && <Loader />}
         <Button type="submit" variant="primary" className="mt-3">
           Sign In
         </Button>
